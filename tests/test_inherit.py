@@ -27,3 +27,10 @@ def test_log_info(capsys):
     foo._info(msg)
     _, log = capsys.readouterr()
     assert not log
+
+
+def test_tb_limit(capsys):
+    msg = str(uuid4())
+    foo = Foo()
+    foo.set_verbose(True, tb_limit=1)
+    foo._info(msg)

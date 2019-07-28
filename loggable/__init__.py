@@ -1,6 +1,7 @@
 import logging
 import math
 import pprint
+import traceback
 
 
 def new_logger(name, level=logging.ERROR):
@@ -12,7 +13,7 @@ def new_logger(name, level=logging.ERROR):
     if not logger.handlers:
         ch = logging.StreamHandler()
         ch.setLevel(level)
-
+        ch.tb_limit = 0
         formatter = logging.Formatter(
             "%(levelname)s - %(name)s - %(asctime)s - %(message)s"
         )
@@ -48,12 +49,7 @@ def condense_long_lists(d, max_list_len=20):
     return str(d)
 
 
-
 class Loggable(object):
-
-    # def init_logger(self, name):
-    #     self._logger_name = name
-    #     new_logger(name)
 
     @property
     def _logger_name(self):
@@ -62,23 +58,19 @@ class Loggable(object):
 
     @property
     def _logger(self):
-        this_logger = logging.getLogger(self._logger_name)
-        if not this_logger:
-            new_logger(self._logger_name)
-            this_logger = logging.getLogger(self._logger_name)
-        return this_logger
+        return new_logger(self._logger_name)[0]
 
-    @property
-    def _log_handlers(self):
-        return self._logger.handlers
 
-    def set_verbose(self, verbose):
+    def set_log_level(self, level, tb_limit=0):
+        for h in self._logger.handlers:
+            h.setLevel(level)
+            h.tb_limit = tb_limit
+
+    def set_verbose(self, verbose, tb_limit=0):
         if verbose:
-            for h in self._log_handlers:
-                h.setLevel(logging.INFO)
+            self.set_log_level(logging.INFO, tb_limit)
         else:
-            for h in self._log_handlers:
-                h.setLevel(logging.ERROR)
+            self.set_log_level(logging.ERROR, tb_limit)
 
     def _pprint_data(
         self, data, width=80, depth=10, max_list_len=20, compact=True, indent=1
@@ -93,6 +85,14 @@ class Loggable(object):
 
     def _info(self, msg):
         self._logger.info(msg)
+        if self._logger.isEnabledFor(logging.INFO):
+            tb_limit = self._logger.handlers[0].tb_limit
+            if tb_limit:
+                traceback.print_stack(limit=tb_limit)
 
     def _error(self, msg):
         self._logger.error(msg)
+        if self._logger.isEnabledFor(logging.ERROR):
+            tb_limit = self._logger.handlers[0].tb_limit
+            if tb_limit:
+                traceback.print_stack(limit=tb_limit)
