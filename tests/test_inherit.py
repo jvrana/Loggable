@@ -1,30 +1,34 @@
 from loggable import Loggable
 from uuid import uuid4
 
-class Foo(Loggable):
+
+class Foo(object):
 
     def __init__(self):
-        pass
+        self.log = Loggable(self)
+
+    def bar(self):
+        self.log.info("bar")
 
 
-def test_basic(capsys):
+def test_basic():
     foo = Foo()
-    foo.set_verbose(True)
-    foo._info("This is some information")
+    foo.log.set_verbose(True)
+    foo.log.info("This is some information")
 
 
 def test_log_info(capsys):
     msg = str(uuid4())
     foo = Foo()
-    foo.set_verbose(True)
-    foo._info(msg)
+    foo.log.set_verbose(True)
+    foo.log.info(msg)
     _, log = capsys.readouterr()
     assert "INFO" in log
     assert "Foo" in log
     assert msg in log
 
-    foo.set_verbose(False)
-    foo._info(msg)
+    foo.log.set_verbose(False)
+    foo.log.info(msg)
     _, log = capsys.readouterr()
     assert not log
 
@@ -32,5 +36,5 @@ def test_log_info(capsys):
 def test_tb_limit(capsys):
     msg = str(uuid4())
     foo = Foo()
-    foo.set_verbose(True, tb_limit=1)
-    foo._info(msg)
+    foo.log.set_verbose(True, tb_limit=10)
+    foo.bar()

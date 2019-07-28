@@ -2,6 +2,7 @@ import logging
 import math
 import pprint
 import traceback
+from logging import DEBUG, INFO, CRITICAL, ERROR, WARN
 
 
 def new_logger(name, level=logging.ERROR):
@@ -51,20 +52,26 @@ def condense_long_lists(d, max_list_len=20):
 
 class Loggable(object):
 
-    @property
-    def _logger_name(self):
-        name = "{}(id={})".format(self.__class__, id(self))
-        return name
+    def __init__(self, inst, name=None):
+        self.instance = inst
+        if name is None:
+            self.name = "{}(id={})".format(self.instance.__class__, id(self.instance))
+        else:
+            self.name = name
 
     @property
-    def _logger(self):
-        return new_logger(self._logger_name)[0]
+    def logger(self):
+        return new_logger(self.name)[0]
 
+    def set_tb_limit(self, limit):
+        for h in self.logger.handlers:
+            h.tb_limit = limit
 
-    def set_log_level(self, level, tb_limit=0):
-        for h in self._logger.handlers:
+    def set_log_level(self, level, tb_limit=None):
+        for h in self.logger.handlers:
             h.setLevel(level)
-            h.tb_limit = tb_limit
+        if tb_limit is not None:
+            self.set_tb_limit(tb_limit)
 
     def set_verbose(self, verbose, tb_limit=0):
         if verbose:
@@ -72,7 +79,7 @@ class Loggable(object):
         else:
             self.set_log_level(logging.ERROR, tb_limit)
 
-    def _pprint_data(
+    def pprint_data(
         self, data, width=80, depth=10, max_list_len=20, compact=True, indent=1
     ):
         return pprint.pformat(
@@ -83,16 +90,26 @@ class Loggable(object):
             compact=compact,
         )
 
-    def _info(self, msg):
-        self._logger.info(msg)
-        if self._logger.isEnabledFor(logging.INFO):
-            tb_limit = self._logger.handlers[0].tb_limit
+    def log(self, msg, level):
+        self.logger.log(level, msg)
+        if self.logger.isEnabledFor(level):
+            tb_limit = self.logger.handlers[0].tb_limit
             if tb_limit:
                 traceback.print_stack(limit=tb_limit)
 
-    def _error(self, msg):
-        self._logger.error(msg)
-        if self._logger.isEnabledFor(logging.ERROR):
-            tb_limit = self._logger.handlers[0].tb_limit
-            if tb_limit:
-                traceback.print_stack(limit=tb_limit)
+    def critical(self, msg):
+        self.log(msg, logging.CRITICAL)
+
+    def error(self, msg):
+        self.log(msg, logging.ERROR)
+
+    def warn(self, msg):
+        self.log(msg, logging.WARNING)
+
+    def info(self, msg):
+        self.log(msg, logging.INFO)
+
+    def debug(self, msg):
+        self.log(msg, logging.DEBUG)
+
+
