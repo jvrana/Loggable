@@ -76,7 +76,7 @@ class Loggable(object):
         if isinstance(object_or_name, str):
             self.name = object_or_name
         else:
-            self.name = "{}(id={})".format(object_or_name.__class__, id(object_or_name))
+            self.name = "{}(id={})".format(object_or_name.__class__.__name__, id(object_or_name))
 
         self.format = format or self.DEFAULT_FORMAT
         self.log_colors = log_colors or self.DEFAULT_COLORS
