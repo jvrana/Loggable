@@ -240,8 +240,8 @@ def test_copy(capsys):
 
     logger1 = Loggable("Parent")
     logger1.set_level("INFO")
-    logger2 = logger1.copy('newname')
-    assert logger2.name == 'newname'
+    logger2 = logger1.copy("newname")
+    assert logger2.name == "newname"
     # logger 1 output
     logger1.info("msg")
     log, _ = capsys.readouterr()

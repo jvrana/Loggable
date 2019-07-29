@@ -216,7 +216,12 @@ class Loggable(object):
         return self.log(msg, DEBUG)
 
     def copy(self, name=None):
-        copied = self.__class__(name or self.name, format=self.format, log_colors=self.log_colors, tqdm=self._tqdm)
+        copied = self.__class__(
+            name or self.name,
+            format=self.format,
+            log_colors=self.log_colors,
+            tqdm=self._tqdm,
+        )
         copied.set_level(self.level())
         return copied
 
@@ -254,8 +259,8 @@ class Loggable(object):
     # def __repr__(self):
     #     return str(self)
 
-class RenamedLoggable(Loggable):
 
+class RenamedLoggable(Loggable):
     def __init__(self, object_or_name, format=None, log_colors=None, tqdm=tqdm):
         new_name = "{}({})".format(self.__class__.__name__, object_or_name)
         super().__init__(new_name, format, log_colors, tqdm)
@@ -320,7 +325,7 @@ class ProgressLoggable(Enterable, LockedLoggable):
             self.pbar.update(x)
 
     def __call__(self, iterable, *args, **kwargs):
-        d = {'desc': self.desc}
+        d = {"desc": self.desc}
         d.update(kwargs)
         return self.tqdm(iterable, self.locked_level, *args, **d)
 
