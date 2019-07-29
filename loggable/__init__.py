@@ -7,6 +7,7 @@ from colorlog import ColoredFormatter
 from tqdm import tqdm
 import arrow
 from abc import ABC, abstractmethod
+import weakref
 
 
 class LoggableException(Exception):
@@ -80,6 +81,7 @@ class Loggable(object):
         self.format = format or self.DEFAULT_FORMAT
         self.log_colors = log_colors or self.DEFAULT_COLORS
         self._tqdm = tqdm
+        self._children = weakref.WeakValueDictionary()
 
     def _new_logger(self, name, level=logging.ERROR):
         """Instantiate a new logger with the given name. If channel handler exists, do not create a new one."""
@@ -110,9 +112,12 @@ class Loggable(object):
             h.tb_limit = limit
         return self
 
+    def level(self):
+        return self.logger_handlers[0].level
+
     def is_enabled(self, level):
         level = self._get_level(level)
-        return level >= self.logger_handlers[0].level
+        return level >= self.level()
 
     def _get_level(self, level):
         if isinstance(level, str):
@@ -136,6 +141,8 @@ class Loggable(object):
             h.setLevel(level)
         if tb_limit is not None:
             self.set_tb_limit(tb_limit)
+        for child in self._children.values():
+            child.set_level(level, tb_limit=tb_limit)
         return self
 
     def set_verbose(self, verbose, tb_limit=0):
@@ -168,6 +175,10 @@ class Loggable(object):
             return progress_bar
         else:
             return iterable
+
+    def _add_child(self, other):
+        self._children[id(other)] = other
+        return other
 
     def spawn(self, cls=None, *args, **kwargs):
         if cls is None:
@@ -204,8 +215,16 @@ class Loggable(object):
     def debug(self, msg):
         return self.log(msg, DEBUG)
 
+    def copy(self, name=None):
+        copied = self.__class__(name or self.name, format=self.format, log_colors=self.log_colors, tqdm=self._tqdm)
+        copied.set_level(self.level())
+        return copied
+
+    def spawn(self, name=None):
+        return self._add_child(self.copy(name))
+
     def timeit(self, level, prefix=""):
-        return TimedLoggable(
+        child = TimedLoggable(
             self.name,
             level,
             prefix=prefix,
@@ -213,9 +232,11 @@ class Loggable(object):
             log_colors=self.log_colors,
             tqdm=self._tqdm,
         )
+        child.set_level(self.level())
+        return self._add_child(child)
 
     def track(self, level, total=None, desc=None):
-        return ProgressLoggable(
+        child = ProgressLoggable(
             self.name,
             level,
             desc=desc,
@@ -224,6 +245,8 @@ class Loggable(object):
             log_colors=self.log_colors,
             tqdm=self._tqdm,
         )
+        child.set_level(self.level())
+        return self._add_child(child)
 
     # def __str__(self):
     #     return "<{} {}>".format(self.__class__.__name__, self.logger)
@@ -231,8 +254,14 @@ class Loggable(object):
     # def __repr__(self):
     #     return str(self)
 
+class RenamedLoggable(Loggable):
 
-class LockedLoggable(Loggable):
+    def __init__(self, object_or_name, format=None, log_colors=None, tqdm=tqdm):
+        new_name = "{}({})".format(self.__class__.__name__, object_or_name)
+        super().__init__(new_name, format, log_colors, tqdm)
+
+
+class LockedLoggable(RenamedLoggable):
     def __init__(self, object_or_name, level, format=None, log_colors=None, tqdm=tqdm):
         super().__init__(object_or_name, format, log_colors, tqdm)
         self.locked_level = level
@@ -244,11 +273,6 @@ class LockedLoggable(Loggable):
     def log(self, msg, level=None):
         level = level or self.locked_level
         super().log(msg, level)
-
-    def set_level(self, *args, **kwargs):
-        raise NotImplemented(
-            "Not implemented for log-locked class {}".format(self.__class__)
-        )
 
 
 class Enterable(ABC):

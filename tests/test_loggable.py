@@ -233,3 +233,63 @@ def test_tb_limit(capsys):
     foo = Foo()
     foo.log.set_verbose(True, tb_limit=10)
     foo.bar()
+
+
+def test_copy(capsys):
+    """We expect copies to initially inherit the log level of their parents."""
+
+    logger1 = Loggable("Parent")
+    logger1.set_level("INFO")
+    logger2 = logger1.copy('newname')
+    assert logger2.name == 'newname'
+    # logger 1 output
+    logger1.info("msg")
+    log, _ = capsys.readouterr()
+    assert "msg" in log
+
+    # logger 2 output
+    logger2.info("msg")
+    log, _ = capsys.readouterr()
+    assert "msg" in log
+
+    logger1.set_level("ERROR")
+
+    # logger 1 output
+    logger1.info("msg")
+    log, _ = capsys.readouterr()
+    assert not log
+
+    # logger 2 output
+    logger2.info("msg")
+    log, _ = capsys.readouterr()
+    assert "msg" in log
+
+
+def test_spawn(capsys):
+    """We expect spawned copies to inherit the log level of their parents."""
+
+    logger1 = Loggable("Parent")
+    logger1.set_level("INFO")
+    logger2 = logger1.spawn("new name")
+
+    # logger 1 output
+    logger1.info("msg")
+    log, _ = capsys.readouterr()
+    assert "msg" in log
+
+    # logger 2 output
+    logger2.info("msg")
+    log, _ = capsys.readouterr()
+    assert "msg" in log
+
+    logger1.set_level("ERROR")
+
+    # logger 1 no output
+    logger1.info("msg")
+    log, _ = capsys.readouterr()
+    assert not log
+
+    # logger 2 no output
+    logger2.info("msg")
+    log, _ = capsys.readouterr()
+    assert not log

@@ -36,7 +36,13 @@ ERROR - MyLogger - 2019-07-29 13:10:10,253 - Error message
 CRITICAL - MyLogger - 2019-07-29 13:10:10,253 - Critical message
 ```
 
-Logging a timed message:
+Logging a custom level:
+
+```python
+>>> logger.log("my custom message", 15)
+```
+
+A log message can be displayed that displays how long a series of command took.
 
 ```python
 >>> with logger.timeit("INFO") as timeit:
@@ -45,8 +51,7 @@ Logging a timed message:
 >>>     timeit.debug("this is a debug message that will not get displayed")
 ```
 
-
-Logging a manually timed message:
+A timed message can be displayed manually using `enter` and `exit` methods.
 
 ```python
 >>> timeit = logger.timeit("INFO")
@@ -57,7 +62,7 @@ INFO - MyLogger - 2019-07-29 13:19:12,301 - Finished in 0:00:00.000528.
 <loggable.TimedLoggable object at 0x10f1bc208>
 ```
 
-Logging with a progress bar:
+A loggable progress bar can be displayed. Progress bar will only be displayed if logging is enabled.
 
 ```python
 >>> for x in logger.tqdm(range(10), "INFO"):
@@ -76,7 +81,8 @@ INFO - MyLogger - 2019-07-29 13:19:12,320 - 35% done!
  35%|████████████████▌| 35/100 [00:00<00:00, 13971.70it/s]
 ```
 
-Making attaching a logger to a model class
+Making attaching a logger to a model class. Instantiating with model instance will create
+a unique logger for that instance.
 
 ```python
 class Foo(object):
