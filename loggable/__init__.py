@@ -253,6 +253,9 @@ class Loggable(object):
         child.set_level(self.level())
         return self._add_child(child)
 
+    def __call__(self, name):
+        return self.spawn(name)
+
     # def __str__(self):
     #     return "<{} {}>".format(self.__class__.__name__, self.logger)
     #
