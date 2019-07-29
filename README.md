@@ -51,6 +51,8 @@ Logging a manually timed message:
 >>> timeit.enter()
 >>> timeit.log("long process")
 >>> timeit.exit()
+INFO - MyLogger - 2019-07-29 13:19:12,301 - Finished in 0:00:00.000528.
+<loggable.TimedLoggable object at 0x10f1bc208>
 ```
 
 Logging with a progress bar:
@@ -63,8 +65,9 @@ Logging with a progress bar:
 Manually updating a progress bar:
 
 ```python
->>> pbar = logger.progress("INFO", desc="my progress bar", total=100).enter()
+>>> pbar = logger.track("INFO", desc="my progress bar", total=100).enter()
 >>> pbar.update(10, "10% done!")
 >>> pbar.update(35, "35% done!")
 >>> pbar.exit()
+ 35%|████████████████▌| 10/100 [00:00<00:00, 13971.70it/s]
 ```
