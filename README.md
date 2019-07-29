@@ -60,7 +60,7 @@ Logging with a progress bar:
 >>>     logger.info(x)
 ```
 
-Updating a manual progress bar:
+Manually updating a progress bar:
 
 ```python
 >>> pbar = logger.progress("INFO", desc="my progress bar", total=100).enter()
