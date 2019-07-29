@@ -1,15 +1,23 @@
 [tool.poetry]
-name = "loggable"
+name = "vrana-loggable"
 version = "0.1.0"
-description = ""
+description = "Logging package. Alpha. Not meant for wider release."
 authors = ["jvrana <justin.vrana@gmail.com>"]
+packages = [
+    { include = "loggable", from = "." },
+]
 
 [tool.poetry.dependencies]
 python = "^3.5"
+colorlog = "^4.0"
+tqdm = "^4.32"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.0"
 black = {version = "^18.3-alpha.0", allows-prereleases = true, python = "^3.6"}
+tox = "^3.13"
+tox-conda = "^0.2.0"
+keats = "^0.2.25"
 
 [build-system]
 requires = ["poetry>=0.12"]
