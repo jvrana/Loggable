@@ -1,5 +1,7 @@
 # Loggable
 
+Logging library with terminal colors, loggable progress bars, and timed logs built in.
+
 ## Installation
 
 ## Usage
