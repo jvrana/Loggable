@@ -69,5 +69,7 @@ Manually updating a progress bar:
 >>> pbar.update(10, "10% done!")
 >>> pbar.update(35, "35% done!")
 >>> pbar.exit()
+INFO - MyLogger - 2019-07-29 13:19:12,320 - 10% done!
+INFO - MyLogger - 2019-07-29 13:19:12,320 - 35% done!
  35%|████████████████▌| 10/100 [00:00<00:00, 13971.70it/s]
 ```
