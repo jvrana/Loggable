@@ -73,3 +73,19 @@ INFO - MyLogger - 2019-07-29 13:19:12,320 - 10% done!
 INFO - MyLogger - 2019-07-29 13:19:12,320 - 35% done!
  35%|████████████████▌| 35/100 [00:00<00:00, 13971.70it/s]
 ```
+
+Making attaching a logger to a model class
+
+```python
+class Foo(object):
+
+    def __init__(self):
+        self.log = Loggable(self)
+
+    def bar(self):
+        self.log.info("bar was called")
+
+foo = Foo()
+foo.log.set_level("INFO", tb_limit=10)
+foo.bar()
+```
