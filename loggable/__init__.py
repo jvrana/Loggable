@@ -167,7 +167,7 @@ class Loggable(object):
     def tqdm(self, iterable, level, *args, **kwargs):
         """Logging """
         level = self._get_level(level)
-        if self.logger.isEnabledFor(level):
+        if self.is_enabled(level):
             progress_bar = self._tqdm(iterable, *args, **kwargs)
             progress_bar.set_description(
                 "{:8} {}".format(logging._levelToName[level], progress_bar.desc)
