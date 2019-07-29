@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "loggable-jdv"
-version = "0.1.1"
+version = "0.1.2"
 description = "Logging package. Alpha. Not meant for wider release."
 authors = ["jvrana <justin.vrana@gmail.com>"]
 packages = [
