@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "vrana-loggable"
+name = "loggable-jdv"
 version = "0.1.0"
 description = "Logging package. Alpha. Not meant for wider release."
 authors = ["jvrana <justin.vrana@gmail.com>"]
@@ -11,6 +11,7 @@ packages = [
 python = "^3.5"
 colorlog = "^4.0"
 tqdm = "^4.32"
+arrow = "^0.14.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.0"

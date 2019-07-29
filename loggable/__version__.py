@@ -3,7 +3,7 @@
 __version__ = "0.1.0"
 __name__ = "vrana-loggable"
 __title__ = "vrana-loggable"
-__authors__ = ['jvrana <justin.vrana@gmail.com>']
+__authors__ = ["jvrana <justin.vrana@gmail.com>"]
 __repo__ = None
 __homepage__ = None
 __description__ = "Logging package. Alpha. Not meant for wider release."

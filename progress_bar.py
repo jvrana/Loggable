@@ -3,6 +3,7 @@ from uuid import uuid4
 from tqdm import tqdm
 import time
 
+
 class Foo(object):
 
     def __init__(self):
