@@ -3,4 +3,5 @@ loggable/__init__.py
 loggable.egg-info/PKG-INFO
 loggable.egg-info/SOURCES.txt
 loggable.egg-info/dependency_links.txt
+loggable.egg-info/requires.txt
 loggable.egg-info/top_level.txt

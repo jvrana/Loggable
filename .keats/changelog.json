@@ -1,0 +1,21 @@
+{
+  "0.1.2": {
+    "description": "bug fixes",
+    "date": "2019-07-29T16:27:05.838478",
+    "changes": [
+      "fixed bug in which progress bar would ignore log levels"
+    ]
+  },
+  "0.1.1": {
+    "description": "new feature",
+    "date": "2019-07-29T16:14:09.752213",
+    "changes": [
+      "Loggable are Loggable factories. Use `logger((\"new name\")` to spawn a new logger"
+    ]
+  },
+  "0.1.0": {
+    "description": "init",
+    "date": "2019-07-29T14:23:48.875726",
+    "changes": []
+  }
+}
