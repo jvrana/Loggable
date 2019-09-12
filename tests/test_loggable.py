@@ -6,6 +6,7 @@ import pytest
 import logging
 import pickle
 
+
 class Foo(object):
     def __init__(self):
         self.log = Loggable(self)
@@ -301,7 +302,7 @@ def test_pickle():
     s = pickle.dumps(logger1)
     logger2 = pickle.loads(s)
 
-    assert logger1.name == 'Parent'
+    assert logger1.name == "Parent"
 
 
 def test_pickle_span():
@@ -320,7 +321,7 @@ def test_pickle_span():
     assert logger3._children[logger2._id] is logger2
     assert logger4._children == {}
 
-    for lvl in ['ERROR', 'DEBUG', 'INFO']:
+    for lvl in ["ERROR", "DEBUG", "INFO"]:
         logger1.set_level(lvl)
         assert logger1.level_name() == lvl
         assert logger2.level_name() == lvl
