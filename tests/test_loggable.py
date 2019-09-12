@@ -4,7 +4,7 @@ from tqdm import tqdm
 import time
 import pytest
 import logging
-
+import pickle
 
 class Foo(object):
     def __init__(self):
@@ -293,3 +293,50 @@ def test_spawn(capsys):
     logger2.info("msg")
     log, _ = capsys.readouterr()
     assert not log
+
+
+def test_pickle():
+
+    logger1 = Loggable("Parent")
+    s = pickle.dumps(logger1)
+    logger2 = pickle.loads(s)
+
+    assert logger1.name == 'Parent'
+
+def test_pickle_span():
+
+    logger1 = Loggable("Parent")
+    logger1.set_level("INFO")
+    logger2 = logger1.spawn("new name")
+
+    assert logger1._children
+    assert logger2._children == {}
+
+    logger3 = pickle.loads(pickle.dumps(logger1))
+    logger4 = pickle.loads(pickle.dumps(logger2))
+
+    assert dict(logger3._children)
+    assert logger3._children[logger2._id] is logger2
+    assert logger4._children == {}
+
+    # # logger 1 output
+    # logger1.info("msg")
+    # log, _ = capsys.readouterr()
+    # assert "msg" in log
+    #
+    # # logger 2 output
+    # logger2.info("msg")
+    # log, _ = capsys.readouterr()
+    # assert "msg" in log
+    #
+    # logger1.set_level("ERROR")
+    #
+    # # logger 1 no output
+    # logger1.info("msg")
+    # log, _ = capsys.readouterr()
+    # assert not log
+    #
+    # # logger 2 no output
+    # logger2.info("msg")
+    # log, _ = capsys.readouterr()
+    # assert not log

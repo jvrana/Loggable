@@ -8,7 +8,7 @@ from tqdm import tqdm
 import arrow
 from abc import ABC, abstractmethod
 import weakref
-
+from itertools import count
 
 class LoggableException(Exception):
     """Generic exception for loggable class"""
@@ -60,8 +60,10 @@ def condense_long_lists(d, max_list_len=20):
     return str(d)
 
 
-class Loggable(object):
+from collections import Counter
 
+
+class Loggable(object):
     DEFAULT_FORMAT = "%(log_color)s%(levelname)s - %(name)s - %(asctime)s - %(message)s"
     DEFAULT_COLORS = {
         "DEBUG": "cyan",
@@ -71,6 +73,9 @@ class Loggable(object):
         "ERROR": "red",
         "CRITICAL": "red,bg_white",
     }
+    graph = {}
+    registered = {}  # id to Loggable
+    counter = count()
 
     def __init__(self, object_or_name, format=None, log_colors=None, tqdm=tqdm):
         if isinstance(object_or_name, str):
@@ -81,7 +86,7 @@ class Loggable(object):
         self.format = format or self.DEFAULT_FORMAT
         self.log_colors = log_colors or self.DEFAULT_COLORS
         self._tqdm = tqdm
-        self._children = weakref.WeakValueDictionary()
+        self._id = next(self.counter)
 
     def _new_logger(self, name, level=logging.ERROR):
         """Instantiate a new logger with the given name. If channel handler exists, do not create a new one."""
@@ -98,6 +103,10 @@ class Loggable(object):
         else:
             handler = handlers[0]
         return logger, handler
+
+    @property
+    def _children(self):
+        return self.registered.setdefault(self._id, weakref.WeakValueDictionary())
 
     @property
     def logger(self):
@@ -177,7 +186,7 @@ class Loggable(object):
             return iterable
 
     def _add_child(self, other):
-        self._children[id(other)] = other
+        self._children[other._id] = other
         return other
 
     def spawn(self, cls=None, *args, **kwargs):
@@ -255,6 +264,12 @@ class Loggable(object):
 
     def __call__(self, name):
         return self.spawn(name)
+
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, d):
+        self.__dict__ = d
 
     # def __str__(self):
     #     return "<{} {}>".format(self.__class__.__name__, self.logger)
