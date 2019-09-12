@@ -1,5 +1,7 @@
 # Loggable
 
+[![PyPI version](https://badge.fury.io/py/loggable-jdv.svg)](https://badge.fury.io/py/loggable-jdv)
+
 Logging library with terminal colors, loggable progress bars, and timed logs built in.
 
 ## Installation
