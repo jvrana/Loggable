@@ -303,6 +303,7 @@ def test_pickle():
 
     assert logger1.name == 'Parent'
 
+
 def test_pickle_span():
 
     logger1 = Loggable("Parent")
@@ -319,24 +320,9 @@ def test_pickle_span():
     assert logger3._children[logger2._id] is logger2
     assert logger4._children == {}
 
-    # # logger 1 output
-    # logger1.info("msg")
-    # log, _ = capsys.readouterr()
-    # assert "msg" in log
-    #
-    # # logger 2 output
-    # logger2.info("msg")
-    # log, _ = capsys.readouterr()
-    # assert "msg" in log
-    #
-    # logger1.set_level("ERROR")
-    #
-    # # logger 1 no output
-    # logger1.info("msg")
-    # log, _ = capsys.readouterr()
-    # assert not log
-    #
-    # # logger 2 no output
-    # logger2.info("msg")
-    # log, _ = capsys.readouterr()
-    # assert not log
+    for lvl in ['ERROR', 'DEBUG', 'INFO']:
+        logger1.set_level(lvl)
+        assert logger1.level_name() == lvl
+        assert logger2.level_name() == lvl
+        assert logger3.level_name() == lvl
+        assert logger4.level_name() == lvl

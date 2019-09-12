@@ -121,6 +121,9 @@ class Loggable(object):
             h.tb_limit = limit
         return self
 
+    def level_name(self):
+        return logging._levelToName[self.level()]
+
     def level(self):
         return self.logger_handlers[0].level
 
