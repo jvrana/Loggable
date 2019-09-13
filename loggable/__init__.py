@@ -356,7 +356,11 @@ class Enterable(ABC):
         try:
             self.exit()
         except Exception as e:
-            warn(LoggableWarning("Exception during 'exit' of {}: {}\n{}".format(self, type(e), e)))
+            warn(
+                LoggableWarning(
+                    "Exception during 'exit' of {}: {}\n{}".format(self, type(e), e)
+                )
+            )
 
 
 class ProgressLoggable(Enterable, LockedLoggable):

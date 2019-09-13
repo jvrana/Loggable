@@ -330,11 +330,8 @@ def test_pickle_span():
 
 
 class TestException(object):
-
     def test_exception_during_exit_raises_only_warning(self):
-
         class FooClass(Enterable):
-
             def enter(self):
                 return self
 
@@ -348,7 +345,7 @@ class TestException(object):
                 pass
 
             assert len(record) == 1
-            msg =  record[0].message.args[0]
+            msg = record[0].message.args[0]
 
             assert "ValueError" in msg
             assert "Exception during 'exit' of " in msg
@@ -356,7 +353,6 @@ class TestException(object):
 
     def test_exception_in_enterable_is_raised(self, capsys):
         class FooClass(Enterable):
-
             def enter(self):
                 return self
 
@@ -367,8 +363,7 @@ class TestException(object):
 
         with pytest.raises(ValueError) as e:
             with foo as f:
-                raise ValueError('This is my error')
-
+                raise ValueError("This is my error")
 
     def test_exception_is_raised_for_timeit(self):
         logger = Loggable("test loggable")
@@ -377,10 +372,10 @@ class TestException(object):
                 raise ValueError
 
     def test_exception_is_raised_for_track(self):
-            logger = Loggable("test loggable")
-            with pytest.raises(ValueError) as e:
-                with logger.track("ERROR", 100):
-                    raise ValueError
+        logger = Loggable("test loggable")
+        with pytest.raises(ValueError) as e:
+            with logger.track("ERROR", 100):
+                raise ValueError
 
     def test_exception_is_raised_for_pbar(self):
         logger = Loggable("test loggable")
@@ -388,4 +383,3 @@ class TestException(object):
             for i in logger.tqdm(range(10), "ERROR"):
                 if i == 5:
                     raise ValueError
-
