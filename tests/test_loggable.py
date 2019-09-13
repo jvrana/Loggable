@@ -1,4 +1,4 @@
-from loggable import Loggable
+from loggable import Loggable, Enterable, LoggableWarning
 from uuid import uuid4
 from tqdm import tqdm
 import time
@@ -327,3 +327,65 @@ def test_pickle_span():
         assert logger2.level_name() == lvl
         assert logger3.level_name() == lvl
         assert logger4.level_name() == lvl
+
+
+class TestException(object):
+
+    def test_exception_during_exit_raises_only_warning(self):
+
+        class FooClass(Enterable):
+
+            def enter(self):
+                return self
+
+            def exit(self):
+                raise ValueError("This is my warning")
+
+        foo = FooClass()
+
+        with pytest.warns(LoggableWarning) as record:
+            with foo as f:
+                pass
+
+            assert len(record) == 1
+            msg =  record[0].message.args[0]
+
+            assert "ValueError" in msg
+            assert "Exception during 'exit' of " in msg
+            assert "This is my warning" in msg
+
+    def test_exception_in_enterable_is_raised(self, capsys):
+        class FooClass(Enterable):
+
+            def enter(self):
+                return self
+
+            def exit(self):
+                raise ValueError("This is my warning")
+
+        foo = FooClass()
+
+        with pytest.raises(ValueError) as e:
+            with foo as f:
+                raise ValueError('This is my error')
+
+
+    def test_exception_is_raised_for_timeit(self):
+        logger = Loggable("test loggable")
+        with pytest.raises(ValueError) as e:
+            with logger.timeit("ERROR"):
+                raise ValueError
+
+    def test_exception_is_raised_for_track(self):
+            logger = Loggable("test loggable")
+            with pytest.raises(ValueError) as e:
+                with logger.track("ERROR", 100):
+                    raise ValueError
+
+    def test_exception_is_raised_for_pbar(self):
+        logger = Loggable("test loggable")
+        with pytest.raises(ValueError) as e:
+            for i in logger.tqdm(range(10), "ERROR"):
+                if i == 5:
+                    raise ValueError
+

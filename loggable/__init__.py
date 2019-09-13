@@ -9,6 +9,11 @@ import arrow
 from abc import ABC, abstractmethod
 import weakref
 from itertools import count
+from warnings import warn
+
+
+class LoggableWarning(Warning):
+    """Generic logger warning"""
 
 
 class LoggableException(Exception):
@@ -61,9 +66,6 @@ def condense_long_lists(d, max_list_len=20):
     return str(d)
 
 
-from collections import Counter
-
-
 class Loggable(object):
     DEFAULT_FORMAT = "%(log_color)s%(levelname)s - %(name)s - %(asctime)s - %(message)s"
     DEFAULT_COLORS = {
@@ -79,6 +81,15 @@ class Loggable(object):
     counter = count()
 
     def __init__(self, object_or_name, format=None, log_colors=None, tqdm=tqdm):
+        """
+        Instantiates a new logger
+
+        :param object_or_name: The name or object to attach the logger. If object is provided, the name
+                                is produced from the object instance.
+        :param format: The logger format. Default is found at Loggable.DEFAULT_FORMAT
+        :param log_colors: The logger colors. Default is found Loggable.DEFAULT_COLORS.
+        :param tqdm: This tqdm class to instantiate progress bars with. Default is tqdm.tqdm.
+        """
         if isinstance(object_or_name, str):
             self.name = object_or_name
         else:
@@ -109,28 +120,35 @@ class Loggable(object):
 
     @property
     def _children(self):
+        """The logger's children loggers."""
         return self.registered.setdefault(self._id, weakref.WeakValueDictionary())
 
     @property
     def logger(self):
+        """The native logger"""
         return self._new_logger(self.name)[0]
 
     @property
     def logger_handlers(self):
+        """The logging handlers for this logger."""
         return self._log_handlers(self.logger)
 
     def set_tb_limit(self, limit):
+        """Set the throwback limit."""
         for h in self.logger.handlers:
             h.tb_limit = limit
         return self
 
     def level_name(self):
+        """Return the current level name, as a string."""
         return logging._levelToName[self.level()]
 
     def level(self):
+        """Return the current level, as an int."""
         return self.logger_handlers[0].level
 
     def is_enabled(self, level):
+        """Returns whether this logger is enabled for the level specified."""
         level = self._get_level(level)
         return level >= self.level()
 
@@ -150,6 +168,7 @@ class Loggable(object):
         return level
 
     def set_level(self, level, tb_limit=None):
+        """Sets the level for this logger and its children."""
         level = self._get_level(level)
         self.logger.setLevel(level)
         for h in self.logger.handlers:
@@ -161,6 +180,7 @@ class Loggable(object):
         return self
 
     def set_verbose(self, verbose, tb_limit=0):
+        """Sets to 'INFO' if True, or 'ERROR' if False"""
         if verbose:
             return self.set_level(logging.INFO, tb_limit)
         else:
@@ -169,6 +189,7 @@ class Loggable(object):
     def pprint_data(
         self, data, width=80, depth=10, max_list_len=20, compact=True, indent=1
     ):
+        """Pretty print data"""
         return pprint.pformat(
             condense_long_lists(data, max_list_len=max_list_len),
             indent=indent,
@@ -180,7 +201,7 @@ class Loggable(object):
     pprint = pprint_data
 
     def tqdm(self, iterable, level, *args, **kwargs):
-        """Logging """
+        """Produce a logged progress bar for an interable"""
         level = self._get_level(level)
         if self.is_enabled(level):
             progress_bar = self._tqdm(iterable, *args, **kwargs)
@@ -206,6 +227,7 @@ class Loggable(object):
         return [h for h in logger.handlers if issubclass(type(h), LoggableHandler)]
 
     def log(self, msg, level):
+        """Log at specified level"""
         level = self._get_level(level)
         logger = self.logger
         logger.log(level, msg)
@@ -216,21 +238,27 @@ class Loggable(object):
         return self
 
     def critical(self, msg):
+        """Log critical error"""
         return self.log(msg, CRITICAL)
 
     def error(self, msg):
+        """Log error"""
         return self.log(msg, ERROR)
 
     def warn(self, msg):
+        """Log warning"""
         return self.log(msg, WARNING)
 
     def info(self, msg):
+        """Log info"""
         return self.log(msg, INFO)
 
     def debug(self, msg):
+        """Log debug"""
         return self.log(msg, DEBUG)
 
     def copy(self, name=None):
+        """Copy this logger"""
         copied = self.__class__(
             name or self.name,
             format=self.format,
@@ -241,9 +269,13 @@ class Loggable(object):
         return copied
 
     def spawn(self, name=None):
+        """Spawn a child logger. Child loggers will automatically inherit the
+        level of their parent. This inheritance occurs after creation as well."""
         return self._add_child(self.copy(name))
 
     def timeit(self, level, prefix=""):
+        """Spawn a logger that computes the time it takes to run commands.
+        The start time and total time will be logged."""
         child = TimedLoggable(
             self.name,
             level,
@@ -256,6 +288,7 @@ class Loggable(object):
         return self._add_child(child)
 
     def track(self, level, total=None, desc=None):
+        """Spawn a progress bar logger, which can update a progress bar."""
         child = ProgressLoggable(
             self.name,
             level,
@@ -267,6 +300,9 @@ class Loggable(object):
         )
         child.set_level(self.level())
         return self._add_child(child)
+
+    # alias for 'track', which is hard to remember
+    pbar = track
 
     def __call__(self, name):
         return self.spawn(name)
@@ -317,7 +353,10 @@ class Enterable(ABC):
         return self.enter()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        return self.exit()
+        try:
+            self.exit()
+        except Exception as e:
+            warn(LoggableWarning("Exception during 'exit' of {}: {}\n{}".format(self, type(e), e)))
 
 
 class ProgressLoggable(Enterable, LockedLoggable):
