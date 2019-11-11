@@ -257,6 +257,9 @@ class Loggable(object):
         """Log debug"""
         return self.log(msg, DEBUG)
 
+    def __copy__(self):
+        return self.copy()
+
     def copy(self, name=None):
         """Copy this logger"""
         copied = self.__class__(

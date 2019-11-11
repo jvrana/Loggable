@@ -295,6 +295,32 @@ def test_spawn(capsys):
     log, _ = capsys.readouterr()
     assert not log
 
+def test_copy_object_with_logger():
+
+    class LoggableObject(object):
+
+        @property
+        def logger(self):
+            return Loggable(self)
+
+        def __copy__(self):
+
+    class Foo(LoggableObject):
+
+        def __init__(self):
+            pass
+
+    from copy import copy
+
+    foo = Foo()
+    foo.logger.set_level("INFO")
+    print(id(foo.logger))
+    foo.logger.info("HEY!")
+    bar = copy(foo)
+
+    del foo
+    print(id(bar.logger))
+    bar.logger.info("HEY!")
 
 def test_pickle():
 
