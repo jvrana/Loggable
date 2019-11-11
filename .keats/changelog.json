@@ -1,7 +1,12 @@
 {
+  "0.1.6": {
+    "description": "",
+    "date": "2019-11-11T09:04:04.595827",
+    "changes": []
+  },
   "0.1.5": {
     "description": "removed keats dependency",
-    "date": "2019-11-11T09:02:32.185265",
+    "date": "2019-11-11T09:03:36.665753",
     "changes": []
   },
   "0.1.4": {

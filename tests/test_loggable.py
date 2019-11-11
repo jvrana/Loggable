@@ -295,10 +295,9 @@ def test_spawn(capsys):
     log, _ = capsys.readouterr()
     assert not log
 
+
 def test_copy_object_with_logger():
-
     class LoggableObject(object):
-
         @property
         def logger(self):
             return Loggable(self)
@@ -307,7 +306,6 @@ def test_copy_object_with_logger():
             pass
 
     class Foo(LoggableObject):
-
         def __init__(self):
             pass
 
@@ -322,6 +320,7 @@ def test_copy_object_with_logger():
     del foo
     print(id(bar.logger))
     bar.logger.info("HEY!")
+
 
 def test_pickle():
 
