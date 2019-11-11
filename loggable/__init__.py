@@ -84,11 +84,15 @@ class Loggable(object):
         """
         Instantiates a new logger
 
-        :param object_or_name: The name or object to attach the logger. If object is provided, the name
-                                is produced from the object instance.
-        :param format: The logger format. Default is found at Loggable.DEFAULT_FORMAT
-        :param log_colors: The logger colors. Default is found Loggable.DEFAULT_COLORS.
-        :param tqdm: This tqdm class to instantiate progress bars with. Default is tqdm.tqdm.
+        :param object_or_name: The name or object to attach the logger. If o
+            bject is provided, the name
+            is produced from the object instance.
+        :param format: The logger format. Default is found at
+            Loggable.DEFAULT_FORMAT
+        :param log_colors: The logger colors. Default is found
+            Loggable.DEFAULT_COLORS.
+        :param tqdm: This tqdm class to instantiate progress bars with.
+            Default is tqdm.tqdm.
         """
         if isinstance(object_or_name, str):
             self.name = object_or_name
@@ -103,7 +107,8 @@ class Loggable(object):
         self._id = next(self.counter)
 
     def _new_logger(self, name, level=logging.ERROR):
-        """Instantiate a new logger with the given name. If channel handler exists, do not create a new one."""
+        """Instantiate a new logger with the given name. If channel handler
+        exists, do not create a new one."""
         logger = logging.getLogger(name)
         logger.setLevel(logging.DEBUG)
         handlers = self._log_handlers(logger)
