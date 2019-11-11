@@ -10,7 +10,7 @@ Logging library with terminal colors, loggable progress bars, and timed logs bui
 
 Basic logger:
 
-```python
+```
 >>> from loggable import Loggable
 >>> logger = Loggable("MyLogger")
 >>> logger.set_level("INFO")
@@ -21,7 +21,7 @@ INFO - MyLogger - 2019-07-29 13:07:59,715 - Informative message
 
 Logging other types of messages:
 
-```python
+```
 >>> logger.info("Informative message")
 INFO - MyLogger - 2019-07-29 13:07:59,715 - Informative message
 
@@ -40,13 +40,13 @@ CRITICAL - MyLogger - 2019-07-29 13:10:10,253 - Critical message
 
 Logging a custom level:
 
-```python
+```
 >>> logger.log("my custom message", 15)
 ```
 
 A log message can be displayed that displays how long a series of command took.
 
-```python
+```
 >>> with logger.timeit("INFO") as timeit:
 >>>     timeit.log("this is an informative message at default INFO level")
 >>>     timeit.error("this is a error message that will get displayed")
@@ -55,7 +55,7 @@ A log message can be displayed that displays how long a series of command took.
 
 A timed message can be displayed manually using `enter` and `exit` methods.
 
-```python
+```
 >>> timeit = logger.timeit("INFO")
 >>> timeit.enter()
 >>> timeit.log("long process")
@@ -66,14 +66,14 @@ INFO - MyLogger - 2019-07-29 13:19:12,301 - Finished in 0:00:00.000528.
 
 A loggable progress bar can be displayed. Progress bar will only be displayed if logging is enabled.
 
-```python
+```
 >>> for x in logger.tqdm(range(10), "INFO"):
 >>>     logger.info(x)
 ```
 
 Manually updating a progress bar:
 
-```python
+```
 >>> pbar = logger.track("INFO", desc="my progress bar", total=100).enter()
 >>> pbar.update(10, "10% done!")
 >>> pbar.update(35, "35% done!")
