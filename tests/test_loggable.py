@@ -302,8 +302,6 @@ def test_copy_object_with_logger():
         def logger(self):
             return Loggable(self)
 
-        def __copy__(self):
-            pass
 
     class Foo(LoggableObject):
         def __init__(self):
@@ -318,7 +316,6 @@ def test_copy_object_with_logger():
     bar = copy(foo)
 
     del foo
-    print(id(bar.logger))
     bar.logger.info("HEY!")
 
 
